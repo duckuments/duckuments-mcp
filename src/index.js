@@ -229,6 +229,20 @@ server.registerPrompt(
   },
 );
 
+// init prompt: gives the `/duckuments:init` trigger; tells the model to call the init tool.
+server.registerPrompt(
+  "init",
+  { title: "Init CLAUDE.md roles", description: "Write your Obsidian roles note into the project's CLAUDE.md." },
+  () => ({
+    messages: [
+      {
+        role: "user",
+        content: { type: "text", text: "Call the init tool to write my roles note into this project's CLAUDE.md." },
+      },
+    ],
+  }),
+);
+
 // commit prompt: gives the `/duckuments:commit` trigger; tells the model to write the message + call the commit tool.
 server.registerPrompt(
   "commit",
