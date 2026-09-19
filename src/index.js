@@ -7,7 +7,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const run = promisify(execFile);
-const git = async (cwd, args) => (await run("git", args, { cwd })).stdout.trim();
+// safe.directory=* so git works when the repo is bind-mounted into a container (host uid != container uid)
+const git = async (cwd, args) => (await run("git", ["-c", "safe.directory=*", ...args], { cwd })).stdout.trim();
 
 // http port avoids the plugin's self-signed cert; use 27124 (https) only if you disable http.
 const BASE = process.env.OBSIDIAN_API_URL ?? "http://127.0.0.1:27123";
@@ -237,7 +238,12 @@ server.registerPrompt(
     messages: [
       {
         role: "user",
-        content: { type: "text", text: "Call the init tool to write my roles note into this project's CLAUDE.md." },
+        content: {
+          type: "text",
+          text:
+            "Call the init tool to write my roles note into this project's CLAUDE.md. " +
+            "Pass `cwd` as the ABSOLUTE path of the current project directory (not a relative path) so it works whether the server runs on the host or in Docker.",
+        },
       },
     ],
   }),
@@ -255,6 +261,7 @@ server.registerPrompt(
           type: "text",
           text:
             "Write a commit message from the currently STAGED changes (`git diff --cached`), then call the commit tool. " +
+            "Pass `cwd` as the ABSOLUTE path of the current project directory (not a relative path) so it works whether the server runs on the host or in Docker. " +
             "Do not stage anything and do not push. " +
             "Message format (conventional, short — no long body):\n" +
             "`type(scope): <emoji> message`\n" +
