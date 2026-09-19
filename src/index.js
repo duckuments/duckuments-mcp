@@ -5,23 +5,33 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { log } from "./log.js";
 
 const run = promisify(execFile);
 // safe.directory=* so git works when the repo is bind-mounted into a container (host uid != container uid)
-const git = async (cwd, args) => (await run("git", ["-c", "safe.directory=*", ...args], { cwd })).stdout.trim();
+const git = async (cwd, args) => {
+  log.debug("git", { cwd, args });
+  return (await run("git", ["-c", "safe.directory=*", ...args], { cwd })).stdout.trim();
+};
 
 // http port avoids the plugin's self-signed cert; use 27124 (https) only if you disable http.
 const BASE = process.env.OBSIDIAN_API_URL ?? "http://127.0.0.1:27123";
 const KEY = process.env.OBSIDIAN_API_KEY;
+if (!KEY) log.warn("OBSIDIAN_API_KEY is not set — every vault request will 401");
 
 // the wrapper every tool reuses
 async function api(path, { method = "GET", body, contentType = "text/markdown", headers = {} } = {}) {
+  log.debug("api", method, path);
   const res = await fetch(`${BASE}${path}`, {
     method,
     headers: { Authorization: `Bearer ${KEY}`, "Content-Type": contentType, ...headers },
     body,
   });
-  if (!res.ok) throw new Error(`${method} ${path} -> ${res.status} ${await res.text()}`);
+  if (!res.ok) {
+    const msg = `${method} ${path} -> ${res.status} ${await res.text()}`;
+    log.error("api failed:", msg);
+    throw new Error(msg);
+  }
   return res.headers.get("content-type")?.includes("json") ? res.json() : res.text();
 }
 
@@ -273,3 +283,4 @@ server.registerPrompt(
 );
 
 await server.connect(new StdioServerTransport());
+log.info("duckuments-mcp connected", { base: BASE });
