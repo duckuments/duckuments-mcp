@@ -108,4 +108,45 @@ server.registerTool(
   async ({ query }) => out(await api(`/search/simple/?query=${encodeURIComponent(query)}`, { method: "POST" })),
 );
 
+// personal layer: reusable prompts, each takes a note path (from the note's Phase 2)
+const PROMPTS = {
+  fill_out: {
+    title: "Fill out a note",
+    what: "Read the note and fill it out: answer its questions, write the text/suggestions it asks for, and find and fix any conflicts inside it. Only read and edit the note — do NOT change any project code. Typically used to explore a project's source or answer questions about it.",
+  },
+  work_on: {
+    title: "Work on a note",
+    what: "Read the note and implement the points it describes into the project code. Typically used for plans that are ready to be built.",
+  },
+  plan_for: {
+    title: "Plan for a note",
+    what: "Review the note and the project, then plan how to implement the note's tasks within the project. Only plan and edit the note's content — do NOT change any project code. Typically used for planning notes.",
+  },
+  debug: {
+    title: "Debug from a note",
+    what: "Read the note, identify and fix the issue based on the problem and information described in it, then state what the problem was and how you resolved it. Typically used for debugging.",
+  },
+};
+
+for (const [name, { title, what }] of Object.entries(PROMPTS)) {
+  server.registerPrompt(
+    name,
+    { title, description: what, argsSchema: { path: z.string().describe("vault-relative path to the note") } },
+    async ({ path }) => {
+      const note = await api(vaultPath(path)); // bind the note in at resolve time
+      return {
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: `${what}\n\nNote at vault path "${path}":\n\n---\n${note}\n---\n\nWrite changes back with the update_note / patch_note tools.`,
+            },
+          },
+        ],
+      };
+    },
+  );
+}
+
 await server.connect(new StdioServerTransport());
