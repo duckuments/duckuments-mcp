@@ -44,6 +44,12 @@ Prompts act on the **active note** in Obsidian (open the note, then run the comm
 claude mcp add duckuments -e OBSIDIAN_API_KEY=<key> -- duckuments-mcp
 ```
 
+Add `--scope user` to make it available in every project instead of just the one you ran this in:
+
+```bash
+claude mcp add duckuments --scope user -e OBSIDIAN_API_KEY=<key> -- duckuments-mcp
+```
+
 Note: Obsidian must be open with the plugin running.
 
 ## Config
