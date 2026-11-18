@@ -3,11 +3,18 @@
   "version": "1.0.0",
   "description": "my personal MCP tool",
   "main": "src/index.js",
+  "bin": {
+    "duckuments-mcp": "src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
-    "inspect": "npx @modelcontextprotocol/inspector node src/index.js",
-    "docker:build": "docker build -t duckuments-mcp ."
+    "inspect": "npx @modelcontextprotocol/inspector node src/index.js"
   },
   "keywords": [
     "duckuments",
@@ -16,14 +23,14 @@
   ],
   "author": "Hirmaan(duckuments)",
   "license": "MIT",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.11.0",
-      "onFail": "download"
-    }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duckuments/duckuments-mcp.git"
   },
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^4.6.5"

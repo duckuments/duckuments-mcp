@@ -10,16 +10,16 @@ Claude Code ──stdio──> duckuments-mcp ──HTTP+Bearer──> Obsidian 
 
 ## Tools
 
-| tool | what it does |
-|------|--------------|
-| `get_note(path)` | read a note by vault-relative path |
-| `get_active()` | read the note currently open in Obsidian |
-| `list_notes(folder?)` | list vault files, or a folder's contents |
-| `update_note(path, content)` | create/overwrite a note (PUT) |
-| `patch_note(path, heading, content, operation?)` | insert under a heading; nest with `::` (e.g. `Design::Flow`) |
-| `search(query)` | plain-text vault search |
-| `commit(message, cwd?)` | commit already-staged files with your git identity (no push, no co-author) |
-| `init(cwd?)` | write your Obsidian roles note into the project's `CLAUDE.md` |
+| tool                                             | what it does                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------------- |
+| `get_note(path)`                                 | read a note by vault-relative path                                         |
+| `get_active()`                                   | read the note currently open in Obsidian                                   |
+| `list_notes(folder?)`                            | list vault files, or a folder's contents                                   |
+| `update_note(path, content)`                     | create/overwrite a note (PUT)                                              |
+| `patch_note(path, heading, content, operation?)` | insert under a heading; nest with `::` (e.g. `Design::Flow`)               |
+| `search(query)`                                  | plain-text vault search                                                    |
+| `commit(message, cwd?)`                          | commit already-staged files with your git identity (no push, no co-author) |
+| `init(cwd?)`                                     | write your Obsidian roles note into the project's `CLAUDE.md`              |
 
 ## Prompts (slash commands)
 
@@ -36,46 +36,23 @@ Prompts act on the **active note** in Obsidian (open the note, then run the comm
 ## Setup
 
 1. Install the **Local REST API** plugin in Obsidian, enable it, and copy its API key.
-2. Configure env:
-   ```bash
-   cp .env.example .env
-   # paste your key into OBSIDIAN_API_KEY (leave values unquoted)
-   ```
-3. Install deps: `pnpm install`
+2. Install: `npm install -g duckuments-mcp`
 
 ## Run
 
-**Node (recommended for local/global use):**
 ```bash
-claude mcp add duckuments -e OBSIDIAN_API_KEY=<key> -- \
-  node /absolute/path/to/duckuments-mcp/src/index.js
+claude mcp add duckuments -e OBSIDIAN_API_KEY=<key> -- duckuments-mcp
 ```
 
-**Docker:**
-```bash
-pnpm docker:build
-claude mcp add --scope user duckuments -- \
-  docker run -i --rm \
-  --add-host host.docker.internal:host-gateway \
-  --env-file /absolute/path/to/.env \
-  -e OBSIDIAN_API_URL=http://host.docker.internal:27123 \
-  -v $HOME/projects:$HOME/projects \
-  -v $HOME/.gitconfig:/root/.gitconfig:ro \
-  duckuments-mcp
-```
-
-Notes:
-- Obsidian must be open with the plugin running.
-- In Docker, override `OBSIDIAN_API_URL` to `host.docker.internal` (the container can't reach the host's `127.0.0.1`), and keep `.env` **unquoted** (Docker's `--env-file` doesn't strip quotes).
-- `commit`/`init` touch the local filesystem, so in Docker the project must be bind-mounted at its real absolute path.
+Note: Obsidian must be open with the plugin running.
 
 ## Config
 
-| env | default | purpose |
-|-----|---------|---------|
-| `OBSIDIAN_API_URL` | `http://127.0.0.1:27123` | plugin base URL |
-| `OBSIDIAN_API_KEY` | — | plugin Bearer key (required) |
-| `DUCKUMENTS_LOG` | `info` | log level: `error`/`warn`/`info`/`debug` (stderr only) |
+| env                | default                  | purpose                                                |
+| ------------------ | ------------------------ | ------------------------------------------------------ |
+| `OBSIDIAN_API_URL` | `http://127.0.0.1:27123` | plugin base URL                                        |
+| `OBSIDIAN_API_KEY` | —                        | plugin Bearer key (required)                           |
+| `DUCKUMENTS_LOG`   | `info`                   | log level: `error`/`warn`/`info`/`debug` (stderr only) |
 
 ## License
 

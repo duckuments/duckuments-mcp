@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -252,7 +253,7 @@ server.registerPrompt(
           type: "text",
           text:
             "Call the init tool to write my roles note into this project's CLAUDE.md. " +
-            "Pass `cwd` as the ABSOLUTE path of the current project directory (not a relative path) so it works whether the server runs on the host or in Docker.",
+            "Pass `cwd` as the ABSOLUTE path of the current project directory (not a relative path).",
         },
       },
     ],
@@ -271,7 +272,7 @@ server.registerPrompt(
           type: "text",
           text:
             "Write a commit message from the currently STAGED changes (`git diff --cached`), then call the commit tool. " +
-            "Pass `cwd` as the ABSOLUTE path of the current project directory (not a relative path) so it works whether the server runs on the host or in Docker. " +
+            "Pass `cwd` as the ABSOLUTE path of the current project directory (not a relative path). " +
             "Do not stage anything and do not push. " +
             "Message format (conventional, short — no long body):\n" +
             "`type(scope): <emoji> message`\n" +
